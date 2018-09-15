@@ -6,6 +6,7 @@
 #include "MfcStudy.h"
 #include "MfcStudyDlg.h"
 #include "afxdialogex.h"
+//#include "TipDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,13 +51,30 @@ END_MESSAGE_MAP()
 
 CMfcStudyDlg::CMfcStudyDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CMfcStudyDlg::IDD, pParent)
+	, m_editSummand(0)
+	, m_editAddend(0)
+	, m_editSum(0)
+	, path(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_pTipDlg=NULL;
+}
+
+CMfcStudyDlg::~CMfcStudyDlg()
+{
+	if(NULL!=m_pTipDlg)
+	{
+		delete m_pTipDlg;
+	}
 }
 
 void CMfcStudyDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_SUMMAND_EDIT, m_editSummand);
+	DDX_Text(pDX, IDC_ADDEND_EDIT, m_editAddend);
+	DDX_Text(pDX, IDC_SUM_EDIT, m_editSum);
+	DDX_Text(pDX, IDC_OPEN_EDIT, path);
 }
 
 BEGIN_MESSAGE_MAP(CMfcStudyDlg, CDialogEx)
@@ -64,6 +82,10 @@ BEGIN_MESSAGE_MAP(CMfcStudyDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDOK, &CMfcStudyDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CMfcStudyDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(IDC_ADD_BUTTON, &CMfcStudyDlg::OnBnClickedAddButton)
+	ON_BN_CLICKED(IDC_BUTTON1, &CMfcStudyDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CMfcStudyDlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -159,4 +181,70 @@ void CMfcStudyDlg::OnBnClickedOk()
 	// TODO: 在此添加控件通知处理程序代码
 	CDialogEx::OnOK();
 	
+}
+
+
+void CMfcStudyDlg::OnBnClickedCancel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CDialogEx::OnCancel();
+}
+
+
+void CMfcStudyDlg::OnBnClickedAddButton()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	INT_PTR nRes;
+	//CTipDlg tipDlg;
+	//nRes=tipDlg.DoModal();
+	//if(IDCANCEL==nRes)
+	//	return; 
+	//if(NULL==m_pTipDlg)
+	//{
+	//	m_pTipDlg=new CTipDlg();
+	//	m_pTipDlg->Create(IDD_TIP_DIALOG,this);
+
+	//}
+
+	//m_pTipDlg->ShowWindow(SW_SHOW);
+
+	//nRes = MessageBox(_T("您确定要进行加法计算吗？"), _T("加法计算器"), MB_OKCANCEL | MB_ICONQUESTION);
+	nRes = AfxMessageBox(_T("您确定要进行加法计算吗？"),  MB_ICONWARNING,0);
+	if(nRes==IDCANCEL) return;
+	UpdateData(TRUE);
+	m_editSum=m_editSummand+m_editAddend;
+	UpdateData(FALSE);
+}
+
+
+void CMfcStudyDlg::OnBnClickedButton1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	TCHAR szFilter[] = _T("文本文件(*.txt)|*.txt|所有文件(*.*)|*.*||");
+	CFileDialog fileDlg(TRUE, _T("txt"), NULL, 0, szFilter, this);
+	CString strFilePath;
+	if (IDOK == fileDlg.DoModal())   
+	{   
+		// 如果点击了文件对话框上的“打开”按钮，则将选择的文件路径显示到编辑框里   
+		strFilePath = fileDlg.GetPathName();
+		path=strFilePath;
+		UpdateData(FALSE);
+		 
+	}
+}
+
+
+void CMfcStudyDlg::OnBnClickedButton2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	TCHAR szFilter[] = _T("文本文件(*.txt)|*.txt|Word文件(*.doc)|*.doc|所有文件(*.*)|*.*||"); 
+	CFileDialog fileDlg(FALSE, _T("doc"), _T("my"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+	CString strFilePath;
+	if (IDOK == fileDlg.DoModal())   
+	{   
+		// 如果点击了文件对话框上的“保存”按钮，则将选择的文件路径显示到编辑框里   
+		strFilePath = fileDlg.GetPathName();   
+		path=strFilePath;
+		UpdateData(FALSE);
+	} 
 }
